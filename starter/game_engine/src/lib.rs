@@ -3,6 +3,7 @@
 #![allow(non_snake_case)]
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
+#[macro_export]
 macro_rules! spawn_sprite {
     ($x:expr, $y:expr, $width:expr, $height:expr, $r:expr, $g:expr, $b:expr) => {{
         let sprite = create_sprite($x, $y, $width, $height, $r, $g, $b);
@@ -11,6 +12,7 @@ macro_rules! spawn_sprite {
     }};
 }
 
+#[macro_export]
 macro_rules! move_sprite {
     ($sprite:expr, $x:expr, $y:expr) => {{
         clear_screen();
@@ -19,6 +21,7 @@ macro_rules! move_sprite {
     }};
 }
 
+#[macro_export]
 macro_rules! tick {
     ($duration:expr) => {{
         update_game_window();
@@ -29,6 +32,7 @@ macro_rules! tick {
     };
 }
 
+#[macro_export]
 macro_rules! on_key_press {
     ($key:expr, $action:block) => {{
         if get_key(get_window(), $key as std::ffi::c_int) == GLFW_PRESS as std::ffi::c_int {
@@ -37,6 +41,7 @@ macro_rules! on_key_press {
     }};
 }
 
+#[macro_export]
 macro_rules! start_window_and_game_loop {
     ($title:expr, $width:expr, $height:expr, $start:block, $loop:block, $exit:block) => {{
         unsafe {

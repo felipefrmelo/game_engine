@@ -13,7 +13,7 @@ fn main() {
     let headers_path = lib_dir.join("opengl_wrapper_lib.h");
     let source_path = lib_dir.join("opengl_wrapper_lib.c");
     let obj_path = output_dir.join("opengl_wrapper_lib.o");
-    let so_path = output_dir.join("libopenglwrapper.so");
+    let static_lib_path = output_dir.join("libopenglwrapper.a");
 
     Command::new("gcc")
         .args(["-c", "-fPIC"])
@@ -23,20 +23,18 @@ fn main() {
         .status()
         .expect("Failed to compile the C source file");
 
-    Command::new("gcc")
-        .args(["-shared", "-o"])
-        .arg(so_path.to_str().unwrap())
+    Command::new("ar")
+        .args(["rcs"])
+        .arg(static_lib_path.to_str().unwrap())
         .arg(obj_path.to_str().unwrap())
-        .args(["-lglfw", "-lGL"])
         .status()
-        .expect("Failed to create the shared library");
+        .expect("Failed to create the static library");
 
-    // Tell cargo to look for shared libraries in the output directory
+
     println!("cargo:rustc-link-search={}", output_dir.to_str().unwrap());
-
-    // Tell cargo to link the shared library
-    println!("cargo:rustc-link-lib=openglwrapper");
-    println!("cargo:rustc-link-arg=-Wl,-rpath,{}", output_dir.to_str().unwrap());
+    println!("cargo:rustc-link-lib=static=openglwrapper");
+    println!("cargo:rustc-link-lib=glfw");
+    println!("cargo:rustc-link-lib=GL");
 
     // Generate bindings using bindgen
     let bindings = bindgen::Builder::default()
