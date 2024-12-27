@@ -30,7 +30,6 @@ fn main() {
         .status()
         .expect("Failed to create the static library");
 
-
     println!("cargo:rustc-link-search={}", output_dir.to_str().unwrap());
     println!("cargo:rustc-link-lib=static=openglwrapper");
     println!("cargo:rustc-link-lib=glfw");

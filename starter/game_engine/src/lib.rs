@@ -6,8 +6,16 @@ include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 #[macro_export]
 macro_rules! spawn_sprite {
     ($x:expr, $y:expr, $width:expr, $height:expr, $r:expr, $g:expr, $b:expr) => {{
+        let x = $x;
+        let y = $y;
+        let width = $width;
+        let height = $height;
+        let r = $r;
+        let g = $g;
+        let b = $b;
+
         unsafe {
-            let sprite = create_sprite($x, $y, $width, $height, $r, $g, $b);
+            let sprite = create_sprite(x, y, width, height, r, g, b);
             render_sprite(sprite);
             sprite
         }
@@ -17,10 +25,13 @@ macro_rules! spawn_sprite {
 #[macro_export]
 macro_rules! move_sprite {
     ($sprite:expr, $x:expr, $y:expr) => {{
+        let x = $x;
+        let y = $y;
+        let sprite = $sprite;
         unsafe {
             clear_screen();
-            update_sprite_position($sprite, $x, $y);
-            render_sprite($sprite);
+            update_sprite_position(sprite, x, y);
+            render_sprite(sprite);
         }
     }};
 }
@@ -28,9 +39,10 @@ macro_rules! move_sprite {
 #[macro_export]
 macro_rules! tick {
     ($duration:expr) => {{
+        let duration = $duration;
         unsafe {
             update_game_window();
-            std::thread::sleep(std::time::Duration::from_millis($duration));
+            std::thread::sleep(std::time::Duration::from_millis(duration));
         }
     }};
     () => {
@@ -52,19 +64,21 @@ macro_rules! on_key_press {
 #[macro_export]
 macro_rules! start_window_and_game_loop {
     ($title:expr, $width:expr, $height:expr, $start:block, $loop:block, $exit:block) => {{
+        let title = $title;
+        let width = $width;
+        let height = $height;
         unsafe {
-            let title = std::ffi::CString::new($title).expect("CString::new failed");
-            create_game_window(title.as_ptr(), $width, $height);
+            let title = std::ffi::CString::new(title).expect("CString::new failed");
+            create_game_window(title.as_ptr(), width, height);
 
+        }
             $start
-
-            while window_should_close() == 0 {
+            while unsafe {window_should_close() == 0} {
                 $loop
                 tick!();
             }
 
             $exit
-        }
     }};
 }
 
@@ -123,7 +137,9 @@ mod tests {
                 tick!(2000);
             },
             {
-                clear_screen();
+                unsafe {
+                    clear_screen();
+                }
                 spawn_sprite!(200.0, 200.0, 100, 100, 0, 255, 0);
             },
             {
