@@ -1,10 +1,10 @@
-use std::{rc::Rc, sync::Arc};
+use std::{rc::Rc, sync::Arc, thread, time::Duration};
 
 use api::GameEngineApi;
 use game::Game;
 use game_engine::*;
-use listener::GameEngineListener;
-use render::GameEngineRenderer;
+use listener::{GameEngineListener, TerminalListener};
+use render::{GameEngineRenderer, TerminalRenderer};
 
 mod api;
 mod game;
@@ -14,6 +14,15 @@ mod render;
 mod threadpool;
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1 && args[1] == "--term" {
+        terminal_run();
+    } else {
+        game_engine_run();
+    }
+}
+
+fn game_engine_run() {
     let listener = Rc::new(GameEngineListener::new());
     let api = Arc::new(GameEngineApi::new());
     let renderer = Arc::new(GameEngineRenderer::new());
@@ -35,4 +44,18 @@ fn main() {
             println!("Finished sprite position update test...");
         }
     );
+}
+
+fn terminal_run() {
+    let listener = Rc::new(TerminalListener::new());
+    let api = Arc::new(GameEngineApi);
+    let renderer = Arc::new(TerminalRenderer::new());
+
+    let game = Game::new(listener, api, renderer);
+
+    loop {
+        game.tick();
+        game.render();
+        thread::sleep(Duration::from_millis(100));
+    }
 }
