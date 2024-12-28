@@ -35,3 +35,40 @@ impl GameListener for GameEngineListener {
         events
     }
 }
+
+use crossterm::{
+    event::{self, Event, KeyCode},
+    terminal::{disable_raw_mode, enable_raw_mode},
+};
+
+pub struct TerminalListener;
+
+impl TerminalListener {
+    pub fn new() -> Self {
+        enable_raw_mode().expect("Failed to enable raw mode");
+        Self
+    }
+}
+
+impl GameListener for TerminalListener {
+    fn get_events(&self) -> Vec<GameEvent> {
+        let mut events = Vec::new();
+        if event::poll(std::time::Duration::from_millis(10)).unwrap() {
+            if let Event::Key(key_event) = event::read().unwrap() {
+                match key_event.code {
+                    KeyCode::Char('w') => events.push(GameEvent::Up),
+                    KeyCode::Char('a') => events.push(GameEvent::Left),
+                    KeyCode::Char('s') => events.push(GameEvent::Down),
+                    KeyCode::Char('d') => events.push(GameEvent::Right),
+                    KeyCode::Char(' ') => events.push(GameEvent::Space),
+                    KeyCode::Esc => {
+                        disable_raw_mode().expect("Failed to disable raw mode");
+                        std::process::exit(0);
+                    }
+                    _ => {}
+                }
+            }
+        }
+        events
+    }
+}
