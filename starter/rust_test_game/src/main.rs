@@ -1,8 +1,25 @@
+use std::{rc::Rc, sync::Arc};
+
+use api::GameEngineApi;
+use game::Game;
 use game_engine::*;
+use listener::GameEngineListener;
+use render::GameEngineRenderer;
+
+mod api;
+mod game;
+mod listener;
+mod models;
+mod render;
+mod threadpool;
 
 fn main() {
-    let mut x = 0.0;
-    let mut y = 0.0;
+    let listener = Rc::new(GameEngineListener::new());
+    let api = Arc::new(GameEngineApi::new());
+    let renderer = Arc::new(GameEngineRenderer::new());
+
+    let game = Game::new(listener, api, renderer.clone());
+
     start_window_and_game_loop!(
         "Rust Test Game",
         800,
@@ -11,10 +28,8 @@ fn main() {
             println!("Starting sprite position update test...");
         },
         {
-            let sprite = spawn_sprite!(x, y, 100, 100, 255, 0, 0);
-            move_sprite!(sprite, x, y);
-            x += 2.0;
-            y += 2.0;
+            game.tick();
+            game.render();
         },
         {
             println!("Finished sprite position update test...");

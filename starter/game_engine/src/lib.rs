@@ -75,7 +75,7 @@ macro_rules! start_window_and_game_loop {
             $start
             while unsafe {window_should_close() == 0} {
                 $loop
-                tick!();
+                tick!(100);
             }
 
             $exit
