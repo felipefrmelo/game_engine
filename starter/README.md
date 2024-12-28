@@ -6,3 +6,5 @@ In this folder, you should see the following folder/files:
 - `c_output/`: The output of compiling: (1) the `opengl_wrapper_lib` source code and making it a shared library, and (2) the `c_test_game` source code.
 - `Makefile`: A makefile with rules to build the `opengl_wrapper_lib` and run the `c_test_game`. In addition, there is a `test-rust` rule that specifies the test-suite you have will have to create for your game engine.
 - `README.md`: The file you are currently reading.
+  
+[Download/View Demo](./rust_test_game.webm)
